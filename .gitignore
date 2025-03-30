@@ -1,0 +1,53 @@
+# Build and publish folders
+/bin/
+/obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider files
+.idea/
+
+# VS Code files
+.vscode/
+
+# ASP.NET specific
+appsettings.Development.json
+appsettings.*.json
+
+# Logs
+*.log
+
+# Dotnet tools
+*.dbmdl
+*.dbproj.schemaview
+*.pfx
+*.publishsettings
+
+# Test results
+TestResults/
+*.trx
+
+# Web config
+*.launch.json
+
+# Others
+*.cache
+*.vspscc
+*.vssscc
+
+# Auto-generated files
+*.g.*
+*.i.*
+*_i.c
+*_p.c
+*_h.h
+
+# Environment
+.env
+
+# HTTP files (optional – if you don’t want to include Postman-style test files)
+# *.http
