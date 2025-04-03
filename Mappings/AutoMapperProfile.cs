@@ -37,7 +37,9 @@ public class AutoMapperProfile : Profile
     CreateMap<Payment, PaymentDto>();
 
     // === Order ===
-    CreateMap<Order, OrderDto>();
+    CreateMap<Order, OrderDto>()
+      .ForMember(dest => dest.TableNumber, opt =>
+        opt.MapFrom(src => src.Table != null ? src.Table.Number : (int?)null));
 
     // === Category ===
     CreateMap<CreateCategoryDto, Category>();

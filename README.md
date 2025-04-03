@@ -6,6 +6,8 @@
 
 ## Overview
 
+## Overview
+
 This project provides a RESTful API designed to efficiently manage common restaurant operations including:
 
 - Menu items management with dynamic categories
@@ -13,6 +15,10 @@ This project provides a RESTful API designed to efficiently manage common restau
 - Order processing
 - Payment handling
 - Table management and reservation validation
+
+> **Entity Relationship Diagram**  
+> The high-level data model of the system is illustrated below:  
+> ![Entity Relationship Diagram](ERD.svg)
 
 The project serves as a solid example of how to build scalable, readable, and maintainable APIs using the latest .NET 9 features, Entity Framework Core, AutoMapper, and structured exception handling.
 

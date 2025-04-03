@@ -31,32 +31,34 @@ public class OrderService
 
   public async Task<OrderDto> CreateAsync(CreateOrderDto dto)
   {
-    // Validate table using dedicated method
-    var table = await _tableRepo.GetByNumberAsync(dto.TableNumber)
-        ?? throw new ResourceNotFoundException($"Table #{dto.TableNumber} not found");
+    Table? table = null;
 
-    if (table.Status == TableStatus.OutOfService)
-      throw new ValidationException($"Table #{dto.TableNumber} is out of service");
-
-    if (table.Status == TableStatus.Occupied)
-      throw new ValidationException($"Table #{dto.TableNumber} is already occupied");
-
-    // Validate customer if provided
-    if (dto.CustomerId.HasValue)
+    if (dto.TableId.HasValue)
     {
-      var exists = await _customerRepo.ExistsAsync(dto.CustomerId.Value);
-      if (!exists)
-        throw new ResourceNotFoundException($"Customer #{dto.CustomerId.Value} not found");
+      // Validate table only if provided
+      table = await _tableRepo.GetByIdAsync(dto.TableId.Value)
+          ?? throw new ResourceNotFoundException($"Table #{dto.TableId} not found");
+
+      if (table.Status == TableStatus.OutOfService)
+        throw new ValidationException($"Table #{table.Number} is out of service");
+
+      if (table.Status == TableStatus.Occupied)
+        throw new ValidationException($"Table #{table.Number} is already occupied");
     }
 
-    // Build Order with custom logic
+    // Validate customer (if provided)
+    if (dto.CustomerId.HasValue && !await _customerRepo.ExistsAsync(dto.CustomerId.Value))
+      throw new ResourceNotFoundException($"Customer #{dto.CustomerId} not found");
+
+    // Build order
     var order = new Order
     {
-      TableNumber = dto.TableNumber,
+      TableId = dto.TableId,
       CreatedAt = DateTime.UtcNow,
       CustomerId = dto.CustomerId
     };
 
+    // Calculate total and add items
     decimal total = 0;
     foreach (var itemDto in dto.Items)
     {
@@ -76,14 +78,15 @@ public class OrderService
     // Save order
     var saved = await _orderRepo.CreateAsync(order);
 
-    // Mark table as occupied
-    table.Status = TableStatus.Occupied;
-    await _tableRepo.UpdateAsync(table);
+    // Mark table as occupied (only if it exists)
+    if (table != null)
+    {
+      table.Status = TableStatus.Occupied;
+      await _tableRepo.UpdateAsync(table);
+    }
 
-    // Use AutoMapper to return the DTO
     return _mapper.Map<OrderDto>(saved);
   }
-
   public async Task<List<OrderDto>> GetAllAsync()
   {
     var orders = await _orderRepo.GetAllAsync();
